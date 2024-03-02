@@ -14,7 +14,6 @@ export class UserService {
         try
         {
             const newUser = await new this.userModel(createUserDto)
-            console.log(newUser);
             return newUser.save()
         }
 
@@ -26,57 +25,43 @@ export class UserService {
 
     async updateUser(userId: string, updateUserDto: UpdateUserDto): Promise<User>
     {
-        try
+        const existingUser = await this.userModel.findByIdAndUpdate(userId, updateUserDto, {new: true});
+        if (!existingUser)
         {
-            const existingUser = await this.userModel.findByIdAndUpdate(userId, updateUserDto, {new: true});
-            return existingUser;
-        }
-
-        catch (err)
-        {   
             throw new NotFoundException(`Cannot find user with id ${userId}`);
         }
+        return existingUser;
     }
 
     async getAllUsers() : Promise<User[]>
     {
-        try
-        {
-            const allUsers = await this.userModel.find();
-            return allUsers;
-        }
-
-        catch (err)
+        const allUsers = await this.userModel.find();
+        if (!allUsers  || allUsers.length == 0)
         {
             throw new NotFoundException("Cannot find any user data");
         }
+        return allUsers;
     }
 
     async getUserById(userId: string) : Promise<User>
     {
-        try
-        {
-            const existingUser = await this.userModel.findById(userId).exec();
-            return existingUser;
-        }
-        catch (err)
+        const existingUser = await this.userModel.findById(userId).exec();
+        if (!existingUser)
         {
             throw new NotFoundException(`Cannot find user with id ${userId}`);
         }
+        return existingUser;
         
     }
 
     async deleteUserById(userId: string) : Promise<User>
     {
-        try
-        {
-            const deletedUser =  await this.userModel.findByIdAndDelete(userId);
-            return deletedUser;
-        }
 
-        catch (err)
+        const deletedUser =  await this.userModel.findByIdAndDelete(userId);
+        if (!deletedUser)
         {
             throw new NotFoundException(`Cannot find user with id ${userId}`);
         }
+        return deletedUser;
     }
 }
