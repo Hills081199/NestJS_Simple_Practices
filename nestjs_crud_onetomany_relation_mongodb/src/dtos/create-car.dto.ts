@@ -7,5 +7,5 @@ export class CreateCarDto{
     model: string
 
     @IsNotEmpty()
-    user: string
+    userId: string
 }

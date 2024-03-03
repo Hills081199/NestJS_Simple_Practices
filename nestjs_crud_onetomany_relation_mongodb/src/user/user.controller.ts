@@ -71,6 +71,7 @@ export class UserController {
     {
         try
         {
+            console.log(typeof(userId));
             const existingUser = await this.userService.getUserById(userId);
             return response.status(HttpStatus.OK).json({
                 message: `User with id ${userId} existed !`,

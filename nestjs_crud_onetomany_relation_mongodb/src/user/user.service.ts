@@ -7,7 +7,7 @@ import { User, UserDocument } from 'src/schemas/user.schema';
 
 @Injectable()
 export class UserService {
-    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+    constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
     async createUser(createUserDto: CreateUserDto): Promise<User>
     {
@@ -45,12 +45,21 @@ export class UserService {
 
     async getUserById(userId: string) : Promise<User>
     {
-        const existingUser = await this.userModel.findById(userId).exec();
-        if (!existingUser)
+        try
         {
-            throw new NotFoundException(`Cannot find user with id ${userId}`);
+            const existingUser = await this.userModel.findById(userId).exec();
+            if (!existingUser)
+            {
+                throw new NotFoundException(`Cannot find user with id ${userId}`);
+            }
+            return existingUser;
         }
-        return existingUser;
+
+        catch (err)
+        {
+            throw new BadRequestException(`Cannot find user with id ${userId} or your request is bad, please check again`);
+        }
+        
         
     }
 
