@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, NotFoundException, Post, Put, Get, Res } from '@nestjs/common';
+import { Body, Controller, HttpStatus, NotFoundException, Post, Put, Get, Delete, Res, Param } from '@nestjs/common';
 import { CarService } from './car.service';
 import { UserService } from 'src/user/user.service';
 import { CreateCarDto } from 'src/dtos/create-car.dto';
@@ -29,9 +29,21 @@ export class CarController {
     }
 
     @Put('/:car_id')
-    async updateCar(@Res() response, @Body() updateCarDto: UpdateCarDto)
+    async updateCar(@Res() response, @Param('car_id') car_id: string, @Body() updateCarDto: UpdateCarDto)
     {
+        try
+        {
+            const updatedCar = await this.carService.updateCar(car_id, updateCarDto);
+            return response.status(HttpStatus.OK).json({
+                message : `Car with id ${car_id} updated`,
+                updatedCar
+            })
+        }
 
+        catch (err)
+        {
+            return response.status(err.status).json(err.response);
+        }
     }
 
     @Get()
@@ -45,6 +57,42 @@ export class CarController {
                 allCars,
             })
         }
+
+        catch (err)
+        {
+            return response.status(err.status).json(err.response);
+        }
+    }
+
+    @Get('/:car_id')
+    async getCarById(@Res() response, @Param('car_id') car_id: string)
+    {
+        try
+        {
+            const car = await this.carService.getCarById(car_id);
+            return response.status(HttpStatus.OK).json({
+                message: `Car with id ${car_id} found !`,
+                car
+            })
+        }
+
+        catch (err)
+        {
+            return response.status(err.status).json(err.response);
+        }
+    }
+
+    @Delete('/:car_id')
+    async deleteCarById(@Res() response, @Param('car_id') car_id: string)
+    {
+        try
+        {
+            const deletedCar = await this.carService.deleteCar(car_id);
+            return response.status(HttpStatus.OK).json({
+                message: `Car with id ${car_id} deleted`,
+                deletedCar
+            })
+        }   
 
         catch (err)
         {

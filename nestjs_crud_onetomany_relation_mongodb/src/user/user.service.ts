@@ -25,12 +25,20 @@ export class UserService {
 
     async updateUser(userId: string, updateUserDto: UpdateUserDto): Promise<User>
     {
-        const existingUser = await this.userModel.findByIdAndUpdate(userId, updateUserDto, {new: true});
-        if (!existingUser)
+        try
         {
-            throw new NotFoundException(`Cannot find user with id ${userId}`);
+            const existingUser = await this.userModel.findByIdAndUpdate(userId, updateUserDto, {new: true});
+            if (!existingUser)
+            {
+                throw new NotFoundException(`Cannot find user with id ${userId}`);
+            }
+            return existingUser;
         }
-        return existingUser;
+
+        catch (err)
+        {
+            throw new BadRequestException(`Cannot find user with id ${userId} or your request is bad, please check again`);
+        }
     }
 
     async getAllUsers() : Promise<User[]>

@@ -3,10 +3,11 @@ import { UserService } from './user.service';
 import { response } from 'express';
 import { CreateUserDto } from 'src/dtos/create-user.dto';
 import { UpdateUserDto } from 'src/dtos/update-user.dto';
+import { CarService } from 'src/car/car.service';
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(private readonly userService: UserService, private readonly carService: CarService) {}
 
     @Post()
     async createUser(@Res() response, @Body() createUserDto: CreateUserDto)
@@ -71,7 +72,6 @@ export class UserController {
     {
         try
         {
-            console.log(typeof(userId));
             const existingUser = await this.userService.getUserById(userId);
             return response.status(HttpStatus.OK).json({
                 message: `User with id ${userId} existed !`,
@@ -86,15 +86,38 @@ export class UserController {
         }
     }
 
+    @Get('/:id/car')
+    async getCarByUserId(@Res() response, @Param('id') userId: string)
+    {
+        try
+        {
+            const existingUser = await this.userService.getUserById(userId);
+            if (existingUser)
+            {
+                const carsByUserId = await this.carService.getCarByUserId(userId);
+                return response.status(HttpStatus.OK).json({
+                    message: `Cars with user id ${userId} found !`,
+                    carsByUserId,
+                })
+            }
+        }
+
+        catch (err)
+        {
+            return response.status(err.status).json(err.response);
+        }
+    }
+
     @Delete('/:id')
     async deleteUserById(@Res() response, @Param('id') userId: string)
     {
         try
         {
             const deletedUser = await this.userService.deleteUserById(userId);
+            await this.carService.deleteCarByUserId(userId);
             return response.status(HttpStatus.OK).json({
                 message: `User with id ${userId} deleted !`,
-                deletedUser
+                deletedUser,
             });
         }
 
