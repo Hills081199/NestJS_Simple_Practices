@@ -14,7 +14,7 @@ export class Category
     @Prop({ required: true })
     title: string;
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Post.name}])
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Post'}])
     posts: Post;
 }
 

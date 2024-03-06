@@ -17,7 +17,7 @@ export class Post
     @Prop()
     description: string;
 
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: Category.name }])
+    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }])
     categories: Category;
 }
 
